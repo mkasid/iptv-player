@@ -61,6 +61,56 @@
             android:inputType="text"
             android:layout_marginBottom="28dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Header"
+            android:text="@string/opensubtitles"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_api_key"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Sign up free at opensubtitles.com, then API section"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_user"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_pass"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:layout_marginBottom="28dp" />
+
         <Button
             android:id="@+id/btnTest"
             android:layout_width="wrap_content"

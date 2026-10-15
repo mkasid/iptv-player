@@ -277,7 +277,7 @@ class DetailsActivity : Activity() {
             runOnUiThread {
                 pb.visibility = View.GONE
                 if (url.isNullOrEmpty()) toast("Could not get a stream URL")
-                else PlayerLauncher.play(this, url, playTitle)
+                else PlayerLauncher.play(this, url, playTitle, hist.key)
             }
         }
     }
