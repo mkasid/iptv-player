@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Header"
+            android:text="@string/settings"
+            android:layout_marginBottom="28dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/portal_url"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etPortal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/mac_address"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etMac"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/omdb_key"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOmdb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Get a free key at omdbapi.com"
+            android:inputType="text"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_bg"
+            android:text="@string/test_connection"
+            android:textColor="@color/on_accent"
+            android:textSize="18sp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Body"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnClearHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_ghost"
+            android:text="@string/clear_history"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnClearCache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_ghost"
+            android:text="@string/clear_cache"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_bg"
+            android:text="@string/save"
+            android:textColor="@color/on_accent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp" />
+    </LinearLayout>
+</ScrollView>
