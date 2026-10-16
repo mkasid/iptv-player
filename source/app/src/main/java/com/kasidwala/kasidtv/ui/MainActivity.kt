@@ -145,11 +145,30 @@ class MainActivity : Activity() {
         historyStates.clear()
         rows.rows.clear()
         rows.notifyDataSetChanged()
+        tvEmpty.visibility = View.VISIBLE
+        tvEmpty.text = getString(R.string.loading)
         thread {
             try {
                 loadAllInner()
             } catch (t: Throwable) {
                 toast("Load failed: ${t.javaClass.simpleName}: ${t.message}")
+            }
+        }
+    }
+
+    /**
+     * Publish a finished row to the UI immediately, so rows appear
+     * progressively instead of all at the end (no long blank screen on
+     * slow portals). All state mutation happens on the UI thread.
+     */
+    private fun publishRow(st: RowState, tab: Int) {
+        runOnUiThread {
+            val states = if (tab == 0) movieStates else seriesStates
+            states.add(st)
+            if (curTab == tab) {
+                rows.rows.add(RowAdapter.RowData(st.header, st.adapter))
+                rows.notifyItemInserted(rows.rows.size - 1)
+                tvEmpty.visibility = View.GONE
             }
         }
     }
@@ -166,7 +185,7 @@ class MainActivity : Activity() {
             for (cat in vodCats) {
                 val st = newRow(cat.title, cat.id, seriesMode = false, useSeriesType = false)
                 fillRow(client, st, minItems = 12)
-                if (st.adapter.items.isNotEmpty()) movieStates.add(st)
+                if (st.adapter.items.isNotEmpty()) publishRow(st, 0)
             }
 
             // Series: dedicated categories when the portal has them,
@@ -176,13 +195,13 @@ class MainActivity : Activity() {
                 for (cat in seriesCats) {
                     val st = newRow(cat.title, cat.id, seriesMode = false, useSeriesType = true)
                     fillRow(client, st, minItems = 12)
-                    if (st.adapter.items.isNotEmpty()) seriesStates.add(st)
+                    if (st.adapter.items.isNotEmpty()) publishRow(st, 1)
                 }
             } else {
                 for (cat in vodCats) {
                     val st = newRow(cat.title, cat.id, seriesMode = true, useSeriesType = false)
                     fillRow(client, st, minItems = 12)
-                    if (st.adapter.items.isNotEmpty()) seriesStates.add(st)
+                    if (st.adapter.items.isNotEmpty()) publishRow(st, 1)
                 }
             }
 
@@ -194,13 +213,16 @@ class MainActivity : Activity() {
                 )
                 st.adapter.items.addAll(hist.map { historyCard(it) })
                 st.exhausted = true
-                historyStates.add(st)
+                runOnUiThread {
+                    historyStates.add(st)
+                    btnTabHistory.visibility = View.VISIBLE
+                }
             }
 
             runOnUiThread {
-                btnTabHistory.visibility =
-                    if (historyStates.isNotEmpty()) View.VISIBLE else View.GONE
                 if (curTab == 2 && historyStates.isEmpty()) curTab = 0
+                // Rebuild the current tab from everything published so far
+                // (covers rows that arrived while the user was on another tab).
                 showTab(curTab)
                 if (movieStates.isEmpty() && seriesStates.isEmpty()) {
                     toast("No content found — check portal settings")
@@ -241,13 +263,20 @@ class MainActivity : Activity() {
     /**
      * Fill [st] with at least [minItems] cards (first load) or one more page
      * (scroll load-more). Must run on a background thread.
+     *
+     * The page loop is bounded: if a category's items are all filtered out
+     * (e.g. only series in a movies row) or the portal ignores paging, we
+     * stop after a few pages instead of requesting forever (blank-screen hang).
      */
     private fun fillRow(client: StalkerClient, st: RowState, minItems: Int = 0) {
         if (st.loading || st.exhausted) return
         st.loading = true
         try {
             val all = mutableListOf<CardItem>()
-            while (!st.exhausted && (minItems == 0 || all.size < minItems)) {
+            var pages = 0
+            val maxPages = if (minItems == 0) 1 else 6
+            while (!st.exhausted && (minItems == 0 || all.size < minItems) && pages < maxPages) {
+                pages++
                 var p = if (st.nextP < 0) 1 else st.nextP
                 var pg = fetchPage(client, st, p)
                 if (st.nextP < 0) {
