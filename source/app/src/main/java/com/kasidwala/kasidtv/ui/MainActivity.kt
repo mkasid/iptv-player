@@ -51,7 +51,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CrashGuard.install(this)
+        // Note: no CrashGuard here — see SetupActivity.
         KasidTVApp.takeCrash(this)?.let { report ->
             AlertDialog.Builder(this)
                 .setTitle("The app crashed last time")

@@ -11,7 +11,6 @@ import android.widget.TextView
 import com.kasidwala.kasidtv.KasidTVApp
 import com.kasidwala.kasidtv.R
 import com.kasidwala.kasidtv.data.Prefs
-import com.kasidwala.kasidtv.player.CrashGuard
 import com.kasidwala.kasidtv.stalker.StalkerClient
 import kotlin.concurrent.thread
 
@@ -20,7 +19,9 @@ class SetupActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CrashGuard.install(this)
+        // Note: no CrashGuard here — KasidTVApp's global handler must stay
+        // installed (CrashGuard would replace it and its dialog can't show
+        // when the UI thread itself dies).
         KasidTVApp.takeCrash(this)?.let { showCrash(it) }
         if (Prefs.isSetupDone(this)) {
             goMain()

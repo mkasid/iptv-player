@@ -20,12 +20,14 @@ class KasidTVApp : Application() {
                 val sw = StringWriter()
                 e.printStackTrace(PrintWriter(sw))
                 val trace = sw.toString().lineSequence().take(25).joinToString("\n")
+                // commit() is synchronous: the report must reach disk before
+                // the process dies, otherwise the next launch sees nothing.
                 app.getSharedPreferences("kasidtv", Context.MODE_PRIVATE).edit()
                     .putString(
                         "last_crash",
                         "${e.javaClass.name}: ${e.message}\nThread: ${t.name}\n\n$trace"
                     )
-                    .apply()
+                    .commit()
             } catch (_: Throwable) {
             }
             // Chain to the system handler so the crash still terminates
