@@ -19,6 +19,7 @@
     <string name="search_hint">Search movies and shows…</string>
     <string name="season">Season</string>
     <string name="episodes">Episodes</string>
+    <string name="optional_keys">Optional keys (can add later in Settings)</string>
     <string name="opensubtitles">OpenSubtitles (automatic subtitles)</string>
     <string name="label_api_key">API key (required for subtitles)</string>
     <string name="label_user">Username (optional, raises limits)</string>

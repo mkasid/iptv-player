@@ -1,6 +1,7 @@
 package com.kasidwala.kasidtv.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -8,6 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.kasidwala.kasidtv.R
 import com.kasidwala.kasidtv.data.Prefs
+import com.kasidwala.kasidtv.player.CrashGuard
 import com.kasidwala.kasidtv.stalker.StalkerClient
 import kotlin.concurrent.thread
 
@@ -16,6 +18,7 @@ class SetupActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CrashGuard.install(this)
         if (Prefs.isSetupDone(this)) {
             goMain()
             return
@@ -24,9 +27,18 @@ class SetupActivity : Activity() {
 
         val etPortal = findViewById<EditText>(R.id.etPortal)
         val etMac = findViewById<EditText>(R.id.etMac)
+        val etOmdb = findViewById<EditText>(R.id.etOmdbSetup)
+        val etOsKey = findViewById<EditText>(R.id.etOsKeySetup)
+        val etOsUser = findViewById<EditText>(R.id.etOsUserSetup)
+        val etOsPass = findViewById<EditText>(R.id.etOsPassSetup)
         val btnSave = findViewById<Button>(R.id.btnSave)
         val tvStatus = findViewById<TextView>(R.id.tvStatus)
         etMac.setText(Prefs.randomMac())
+        etOmdb.setText(Prefs.getOmdbKey(this))
+        val osPrefs = getSharedPreferences("autosub", Context.MODE_PRIVATE)
+        etOsKey.setText(osPrefs.getString("api_key", ""))
+        etOsUser.setText(osPrefs.getString("os_user", ""))
+        etOsPass.setText(osPrefs.getString("os_pass", ""))
 
         btnSave.setOnClickListener {
             val portal = etPortal.text.toString().trim().trimEnd('/')
@@ -38,13 +50,23 @@ class SetupActivity : Activity() {
             tvStatus.text = "Testing connection…"
             btnSave.isEnabled = false
             thread {
-                val ok = StalkerClient(portal, mac).handshake()
+                val ok = try {
+                    StalkerClient(portal, mac).handshake()
+                } catch (t: Throwable) {
+                    false
+                }
                 runOnUiThread {
                     btnSave.isEnabled = true
                     if (ok) {
                         Prefs.setPortalUrl(this, portal)
                         Prefs.setMac(this, mac)
+                        Prefs.setOmdbKey(this, etOmdb.text.toString())
                         Prefs.setSetupDone(this, true)
+                        osPrefs.edit()
+                            .putString("api_key", etOsKey.text.toString().trim())
+                            .putString("os_user", etOsUser.text.toString().trim())
+                            .putString("os_pass", etOsPass.text.toString())
+                            .apply()
                         goMain()
                     } else {
                         tvStatus.text = "Could not connect — check the portal URL and MAC."

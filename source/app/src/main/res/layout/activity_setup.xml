@@ -1,75 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:background="@color/bg"
-    android:padding="48dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/text_primary"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="48dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Text.KasidTV.Body"
-        android:text="Enter your Stalker portal details to get started."
-        android:layout_marginBottom="32dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/text_primary"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        style="@style/Text.KasidTV.Meta"
-        android:text="@string/portal_url"
-        android:layout_marginBottom="6dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Body"
+            android:text="Enter your Stalker portal details to get started."
+            android:layout_marginBottom="32dp" />
 
-    <EditText
-        android:id="@+id/etPortal"
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        android:hint="http://portal.example.com:8080"
-        android:inputType="textUri"
-        android:layout_marginBottom="20dp" />
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/portal_url"
+            android:layout_marginBottom="6dp" />
 
-    <TextView
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        style="@style/Text.KasidTV.Meta"
-        android:text="@string/mac_address"
-        android:layout_marginBottom="6dp" />
+        <EditText
+            android:id="@+id/etPortal"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:hint="http://portal.example.com:8080"
+            android:inputType="textUri"
+            android:layout_marginBottom="20dp" />
 
-    <EditText
-        android:id="@+id/etMac"
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        android:hint="00:1A:79:XX:XX:XX"
-        android:inputType="text"
-        android:layout_marginBottom="28dp" />
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/mac_address"
+            android:layout_marginBottom="6dp" />
 
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_bg"
-        android:text="@string/test_save"
-        android:textColor="@color/on_accent"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:paddingTop="14dp"
-        android:paddingBottom="14dp"
-        android:layout_marginBottom="16dp" />
+        <EditText
+            android:id="@+id/etMac"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:hint="00:1A:79:XX:XX:XX"
+            android:inputType="text"
+            android:layout_marginBottom="28dp" />
 
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        style="@style/Text.KasidTV.Body"
-        android:gravity="center" />
-</LinearLayout>
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Header"
+            android:text="@string/optional_keys"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/omdb_key"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOmdbSetup"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:hint="Optional — ratings and posters (omdbapi.com)"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_api_key"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsKeySetup"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:hint="Optional — automatic subtitles (opensubtitles.com)"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_user"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsUserSetup"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Meta"
+            android:text="@string/label_pass"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etOsPassSetup"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_bg"
+            android:text="@string/test_save"
+            android:textColor="@color/on_accent"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.KasidTV.Body"
+            android:gravity="center" />
+    </LinearLayout>
+</ScrollView>

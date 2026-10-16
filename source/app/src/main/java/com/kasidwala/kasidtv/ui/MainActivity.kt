@@ -15,6 +15,7 @@ import com.kasidwala.kasidtv.data.DbHelper
 import com.kasidwala.kasidtv.data.HistoryEntry
 import com.kasidwala.kasidtv.data.OmdbClient
 import com.kasidwala.kasidtv.data.Prefs
+import com.kasidwala.kasidtv.player.CrashGuard
 import com.kasidwala.kasidtv.stalker.StalkerClient
 import com.kasidwala.kasidtv.stalker.VodPage
 import kotlin.concurrent.thread
@@ -48,6 +49,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CrashGuard.install(this)
         if (!Prefs.isSetupDone(this)) {
             startActivity(Intent(this, SetupActivity::class.java))
             finish()
@@ -143,10 +145,19 @@ class MainActivity : Activity() {
         rows.rows.clear()
         rows.notifyDataSetChanged()
         thread {
+            try {
+                loadAllInner()
+            } catch (t: Throwable) {
+                toast("Load failed: ${t.javaClass.simpleName}: ${t.message}")
+            }
+        }
+    }
+
+    private fun loadAllInner() {
             val client = newClient()
             if (!client.ensureAuth()) {
                 toast("Could not connect to portal — check Settings")
-                return@thread
+                return
             }
 
             // Movies by category (series entries filtered out).
@@ -194,7 +205,6 @@ class MainActivity : Activity() {
                     toast("No content found — check portal settings")
                 }
             }
-        }
     }
 
     /** Create a row whose adapter loads more pages on scroll. */
@@ -261,9 +271,13 @@ class MainActivity : Activity() {
 
     private fun loadMore(st: RowState) {
         thread {
-            val client = newClient()
-            if (!client.ensureAuth()) return@thread
-            fillRow(client, st)
+            try {
+                val client = newClient()
+                if (!client.ensureAuth()) return@thread
+                fillRow(client, st)
+            } catch (t: Throwable) {
+                // scroll load-more must never crash the app
+            }
         }
     }
 
