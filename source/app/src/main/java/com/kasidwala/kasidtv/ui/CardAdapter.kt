@@ -14,6 +14,7 @@ import com.kasidwala.kasidtv.data.ImageLoader
 class CardAdapter(
     private val onClick: (CardItem) -> Unit,
     private val onLoadMore: (() -> Unit)? = null,
+    private val onLongClick: ((CardItem) -> Unit)? = null,
 ) : RecyclerView.Adapter<CardAdapter.VH>() {
 
     val items = mutableListOf<CardItem>()
@@ -51,6 +52,12 @@ class CardAdapter(
             h.pb.visibility = View.GONE
         }
         h.itemView.setOnClickListener { onClick(item) }
+        h.itemView.setOnLongClickListener {
+            if (item.kind == CardKind.HISTORY) {
+                onLongClick?.invoke(item)
+                true
+            } else false
+        }
         if (pos >= items.size - 6 && items.size >= 10) onLoadMore?.invoke()
     }
 

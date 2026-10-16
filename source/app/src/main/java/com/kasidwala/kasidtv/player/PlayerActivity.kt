@@ -762,9 +762,15 @@ class PlayerActivity : Activity() {
         if (streamUri == null) return
         val pos = p.currentPosition
         val dur = p.duration.takeIf { it > 0 } ?: 0L
-        // Keep Kasid TV's Continue Watching progress live.
-        histKey?.let { DbHelper.get(this).updateProgress(it, pos, dur) }
-        if (pos > 5_000) {
+        // Fully watched (>=95%): drop from Continue Watching instead of updating.
+        val finished = dur > 0 && pos >= (dur * 0.95).toLong()
+        histKey?.let {
+            if (finished) DbHelper.get(this).deleteHistory(it)
+            else DbHelper.get(this).updateProgress(it, pos, dur)
+        }
+        if (finished) {
+            resumeStore.clear(resumeKey())
+        } else if (pos > 5_000) {
             resumeStore.save(resumeKey(), pos, dur, streamTitle)
         }
     }

@@ -1,6 +1,7 @@
 package com.kasidwala.kasidtv.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -215,9 +216,26 @@ class MainActivity : Activity() {
         val adapter = CardAdapter(
             onClick = ::onCardClick,
             onLoadMore = { holder[0]?.let { loadMore(it) } },
+            onLongClick = ::onCardLongClick,
         )
         return RowState(header, adapter, categoryId, seriesMode, useSeriesType)
             .also { holder[0] = it }
+    }
+
+    /** Long-press a Continue Watching card to remove it from history. */
+    private fun onCardLongClick(c: CardItem) {
+        val key = c.histKey ?: return
+        AlertDialog.Builder(this)
+            .setTitle(c.title)
+            .setMessage(getString(R.string.remove_from_history_q))
+            .setPositiveButton(getString(R.string.remove)) { _, _ ->
+                thread {
+                    DbHelper.get(this).deleteHistory(key)
+                    runOnUiThread { refreshHistoryRow() }
+                }
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
     /**

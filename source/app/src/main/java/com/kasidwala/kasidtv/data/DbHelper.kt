@@ -79,6 +79,9 @@ class DbHelper private constructor(context: Context) :
 
     fun clearHistory() = writableDatabase.delete("history", null, null)
 
+    fun deleteHistory(key: String) =
+        writableDatabase.delete("history", "key=?", arrayOf(key))
+
     private fun row(c: android.database.Cursor) = HistoryEntry(
         key = c.getString(0), title = c.getString(1), poster = c.getString(2),
         kind = c.getString(3), seriesTitle = c.getString(4), seriesId = c.getString(5),
