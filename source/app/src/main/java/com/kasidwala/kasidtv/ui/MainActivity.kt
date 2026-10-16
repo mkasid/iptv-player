@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kasidwala.kasidtv.KasidTVApp
 import com.kasidwala.kasidtv.R
 import com.kasidwala.kasidtv.data.DbHelper
 import com.kasidwala.kasidtv.data.HistoryEntry
@@ -51,6 +52,13 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CrashGuard.install(this)
+        KasidTVApp.takeCrash(this)?.let { report ->
+            AlertDialog.Builder(this)
+                .setTitle("The app crashed last time")
+                .setMessage(report)
+                .setPositiveButton("Close", null)
+                .show()
+        }
         if (!Prefs.isSetupDone(this)) {
             startActivity(Intent(this, SetupActivity::class.java))
             finish()

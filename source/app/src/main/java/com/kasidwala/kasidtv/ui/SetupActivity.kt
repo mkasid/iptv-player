@@ -1,12 +1,14 @@
 package com.kasidwala.kasidtv.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.kasidwala.kasidtv.KasidTVApp
 import com.kasidwala.kasidtv.R
 import com.kasidwala.kasidtv.data.Prefs
 import com.kasidwala.kasidtv.player.CrashGuard
@@ -19,6 +21,7 @@ class SetupActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CrashGuard.install(this)
+        KasidTVApp.takeCrash(this)?.let { showCrash(it) }
         if (Prefs.isSetupDone(this)) {
             goMain()
             return
@@ -79,5 +82,14 @@ class SetupActivity : Activity() {
     private fun goMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    /** Shows the previous run's crash (saved by KasidTVApp) so it can be reported. */
+    private fun showCrash(report: String) {
+        AlertDialog.Builder(this)
+            .setTitle("The app crashed last time")
+            .setMessage(report)
+            .setPositiveButton("Close", null)
+            .show()
     }
 }
