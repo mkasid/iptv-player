@@ -60,7 +60,18 @@ object ImageLoader {
                 readTimeout = 12000
             }
             if (conn.responseCode != 200) return null
-            val bytes = conn.inputStream.readBytes()
+            // Manual buffered read: InputStream.readBytes() is Java 9+ (API 33),
+            // but the Firestick runs older Android -> NoSuchMethodError.
+            val bytes = conn.inputStream.use { ins ->
+                val out = java.io.ByteArrayOutputStream()
+                val buf = ByteArray(8192)
+                while (true) {
+                    val n = ins.read(buf)
+                    if (n <= 0) break
+                    out.write(buf, 0, n)
+                }
+                out.toByteArray()
+            }
             // Downsample to poster-ish size to keep memory sane.
             val opts = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
