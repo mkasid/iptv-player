@@ -141,9 +141,8 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
                 // Adopt the session: call get_profile with full device profile
                 // (signature, device_id, etc.) so the token is honored on
                 // vod/series calls (from Lumora's working implementation).
-                val devParams = deviceParams().toMutableMap()
-                devParams["mac"] = mac.uppercase()
-                api("stb", "get_profile", devParams, retryAuth = false)
+                // Note: api() already adds &mac=, so don't duplicate it here.
+                api("stb", "get_profile", deviceParams(), retryAuth = false)
                 return true
             }
         }
