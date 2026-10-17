@@ -23,24 +23,29 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
     companion object {
         /** MAG-style UA; many portals reject unknown clients. */
         const val UA =
-            "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 " +
-                "(KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3"
+            "Mozilla/5.0 (QtEmbedded; U; Linux; Linux; MAG250; Model: MAG250; Link: WiFi) " +
+                "AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3"
     }
 
     // ------------------------------------------------------------------ http
 
-    private fun httpGet(url: String): String? {
+    private fun httpGet(url: String, jsToken: String? = null): String? {
         var conn: HttpURLConnection? = null
         return try {
             conn = (URL(url).openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
                 setRequestProperty("User-Agent", UA)
-                setRequestProperty("Cookie", "mac=$mac; stb_lang=en; timezone=UTC;")
+                setRequestProperty(
+                    "Cookie",
+                    "mac=${URLEncoder.encode(mac.uppercase(), "UTF-8")}; stb_lang=en; timezone=Europe%2FLondon;"
+                )
                 // Full Stalker/Ministra portals require the token as a Bearer
                 // header on every call except handshake/get_profile (auth
                 // failures come back as HTTP 200 "Authorization failed.");
                 // the ?token= query param is kept for older panels.
                 token?.let { setRequestProperty("Authorization", "Bearer $it") }
+                // X-Js-Request-Token header (from Lumora's working implementation).
+                jsToken?.let { setRequestProperty("X-Js-Request-Token", it) }
                 connectTimeout = 15000
                 readTimeout = 25000
             }
@@ -51,6 +56,32 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
         } finally {
             conn?.disconnect()
         }
+    }
+
+    /** MD5 hex of the input (for device signature). */
+    private fun md5(s: String): String {
+        val digest = java.security.MessageDigest.getInstance("MD5").digest(s.toByteArray())
+        return digest.joinToString("") { "%02x".format(it).uppercase() }
+    }
+
+    /** Generate device profile params (from Lumora's working implementation). */
+    private fun deviceParams(): Map<String, String> {
+        val cleanMac = mac.replace(":", "").replace("-", "").uppercase()
+        val sn = "000000000000"
+        val deviceId = cleanMac + sn.take(9)
+        val deviceId2 = "0123456789ABCDEF0123456789ABCDEF"
+        val signature = md5(cleanMac + sn + deviceId2)
+        return mapOf(
+            "sn" to sn,
+            "device_id" to deviceId,
+            "device_id2" to deviceId2,
+            "signature" to signature,
+            "hd" to "1",
+            "ver" to "",
+            "num_banks" to "1",
+            "stb_type" to "MAG250",
+            "image_version" to "218"
+        )
     }
 
     private fun endpointVariants(): List<String> {
@@ -70,12 +101,14 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
     ): JSONObject? {
         val ep = endpoint ?: return null
         val qs = StringBuilder("?type=").append(type).append("&action=").append(action)
-            .append("&JsHttpRequest=1-xml")
+        // MAC as query param (critical - portals key session to this, from Lumora).
+        qs.append("&mac=").append(URLEncoder.encode(mac.uppercase(), "UTF-8"))
+        qs.append("&JsHttpRequest=1-xml")
         token?.let { qs.append("&token=").append(URLEncoder.encode(it, "UTF-8")) }
         for ((k, v) in params) {
             qs.append('&').append(k).append('=').append(URLEncoder.encode(v, "UTF-8"))
         }
-        val body = httpGet(ep + qs.toString()) ?: return null
+        val body = httpGet(ep + qs.toString(), jsToken = token) ?: return null
         val js = try {
             JSONObject(body).optJSONObject("js")
         } catch (e: Exception) {
@@ -105,9 +138,12 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
             if (!tok.isNullOrEmpty()) {
                 endpoint = ep
                 token = tok
-                // Adopt the session: call get_profile once so the token is
-                // honored on vod/series calls (mirrors TiviMate's flow).
-                api("stb", "get_profile", retryAuth = false)
+                // Adopt the session: call get_profile with full device profile
+                // (signature, device_id, etc.) so the token is honored on
+                // vod/series calls (from Lumora's working implementation).
+                val devParams = deviceParams().toMutableMap()
+                devParams["mac"] = mac.uppercase()
+                api("stb", "get_profile", devParams, retryAuth = false)
                 return true
             }
         }
