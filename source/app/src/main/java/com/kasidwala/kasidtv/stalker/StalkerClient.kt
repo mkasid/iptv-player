@@ -36,6 +36,11 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
                 requestMethod = "GET"
                 setRequestProperty("User-Agent", UA)
                 setRequestProperty("Cookie", "mac=$mac; stb_lang=en; timezone=UTC;")
+                // Full Stalker/Ministra portals require the token as a Bearer
+                // header on every call except handshake/get_profile (auth
+                // failures come back as HTTP 200 "Authorization failed.");
+                // the ?token= query param is kept for older panels.
+                token?.let { setRequestProperty("Authorization", "Bearer $it") }
                 connectTimeout = 15000
                 readTimeout = 25000
             }
@@ -100,6 +105,9 @@ class StalkerClient(private val portalUrl: String, private val mac: String) {
             if (!tok.isNullOrEmpty()) {
                 endpoint = ep
                 token = tok
+                // Adopt the session: call get_profile once so the token is
+                // honored on vod/series calls (mirrors TiviMate's flow).
+                api("stb", "get_profile", retryAuth = false)
                 return true
             }
         }
